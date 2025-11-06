@@ -8,7 +8,6 @@ export interface Medication {
   dosageAmount: number;
   dosageUnit: string;
   form: string;
-  formOther?: string;
   reason: string;
   frequency: string;
   times: string[];
@@ -37,8 +36,10 @@ export class MedicationsComponent implements OnInit {
     dosageAmount: null as number | null,
     dosageUnit: '',
     form: 'tablet',
+    formOtherText: '',
     reason: '',
     frequency: 'Once daily',
+    frequencyOtherText: '',
     times: [''],
     startDate: '',
     endDate: '',
@@ -163,8 +164,10 @@ export class MedicationsComponent implements OnInit {
       dosageAmount: null,
       dosageUnit: '',
       form: 'tablet',
+      formOtherText: '',
       reason: '',
       frequency: 'Once daily',
+      frequencyOtherText: '',
       times: [''],
       startDate: '',
       endDate: '',
@@ -197,6 +200,16 @@ export class MedicationsComponent implements OnInit {
       return;
     }
 
+    if (this.medicationForm.form === 'Other' && !this.medicationForm.formOtherText) {
+      alert('Please specify the medication form');
+      return;
+    }
+
+    if (this.medicationForm.frequency === 'Other' && !this.medicationForm.frequencyOtherText) {
+      alert('Please specify the frequency');
+      return;
+    }
+
     if (this.medicationForm.endDate && this.medicationForm.startDate > this.medicationForm.endDate) {
       alert('Please ensure the Start Date is prior to the End Date');
       return;
@@ -207,9 +220,9 @@ export class MedicationsComponent implements OnInit {
       name: this.medicationForm.name,
       dosageAmount: this.medicationForm.dosageAmount!,
       dosageUnit: this.medicationForm.dosageUnit,
-      form: this.medicationForm.form,
+      form: this.medicationForm.form === 'Other' ? this.medicationForm.formOtherText : this.medicationForm.form,
       reason: this.medicationForm.reason || '',
-      frequency: this.medicationForm.frequency,
+      frequency: this.medicationForm.frequency === 'Other' ? this.medicationForm.frequencyOtherText : this.medicationForm.frequency,
       times: this.medicationForm.times.filter(t => t), // Remove empty times
       startDate: this.medicationForm.startDate,
       endDate: this.medicationForm.noEndDate ? undefined : this.medicationForm.endDate,
