@@ -1,0 +1,157 @@
+<div class="medications-container">
+  <div class="medications-header">
+    <h1>Medication List</h1>
+    <button class="add-button" (click)="openAddModal()">Add Medication</button>
+  </div>
+
+  <div class="table-container">
+    <table class="medications-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Dosage</th>
+          <th>Form</th>
+          <th>Frequency</th>
+          <th>Reason</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Notes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let med of medications">
+          <td>{{ med.name }}</td>
+          <td>{{ formatDosage(med) }}</td>
+          <td>{{ med.form.charAt(0).toUpperCase() + med.form.slice(1) }}{{ med.formOther ? ' (' + med.formOther + ')' : '' }}</td>
+          <td>{{ formatFrequency(med) }}</td>
+          <td>{{ med.reason || '-' }}</td>
+          <td>{{ formatDate(med.startDate) }}</td>
+          <td>{{ med.noEndDate ? 'No end date' : (med.endDate ? formatDate(med.endDate) : '-') }}</td>
+          <td class="notes-cell">
+            <button 
+              *ngIf="med.notes" 
+              class="notes-button" 
+              (click)="openNotesModal(med)">
+              Show Notes
+            </button>
+            <span *ngIf="!med.notes">-</span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-button" (click)="editMedication(med)">Edit</button>
+            <button class="delete-button" (click)="deleteMedication(med)" title="Delete">🗑️</button>
+          </td>
+        </tr>
+        <tr *ngIf="medications.length === 0">
+          <td colspan="9" class="empty-state">No medications available.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Notes Modal -->
+  <div class="modal-overlay" *ngIf="showNotesModal" (click)="closeNotesModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedMedication?.name }} - Notes</h2>
+        <button class="close-button" (click)="closeNotesModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>{{ selectedMedication?.notes }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Medication Modal -->
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+    <div class="modal-content add-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Add Medication</h2>
+        <button class="close-button" (click)="closeAddModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="addMedication()">
+          <div class="form-group">
+            <label>Medication Name *</label>
+            <input type="text" [(ngModel)]="medicationForm.name" name="name" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label>Dosage *</label>
+            <div class="dosage-inputs">
+              <input type="number" [(ngModel)]="medicationForm.dosageAmount" name="dosageAmount" 
+                     class="form-control dosage-amount" placeholder="Amount" required>
+              <input type="text" [(ngModel)]="medicationForm.dosageUnit" name="dosageUnit" 
+                     class="form-control s" placeholder="Unit (mg, ml)" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Form *</label>
+            <select [(ngModel)]="medicationForm.form" name="form" class="form-control" required>
+              <option value="tablet">Tablet</option>
+              <option value="capsule">Capsule</option>
+              <option value="liquid">Liquid</option>
+              <option value="injection">Injection</option>
+              <option value="ointment">Ointment</option>
+              <option value="patch">Patch</option>
+              <option value="inhaler">Inhaler</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Frequency *</label>
+            <select [(ngModel)]="medicationForm.frequency" name="frequency" 
+                    class="form-control" (change)="onFrequencyChange()" required>
+              <option value="Once daily">Once daily</option>
+              <option value="Twice daily">Twice daily</option>
+              <option value="Three times daily">Three times daily</option>
+              <option value="Four times daily">Four times daily</option>
+              <option value="As needed">As needed</option>
+              <option value="Weekly">Weekly</option>
+            </select>
+          </div>
+
+          <div class="form-group" *ngIf="medicationForm.frequency.includes('daily') && medicationForm.times.length > 0">
+            <label>Time(s)</label>
+            <div *ngFor="let time of medicationForm.times; let i = index" class="times-container-">
+              <input type="time" [(ngModel)]="medicationForm.times[i]" [name]="'time' + i" class="form-control time-input">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Reason</label>
+            <input type="text" [(ngModel)]="medicationForm.reason" name="reason" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Start Date *</label>
+            <input type="date" [(ngModel)]="medicationForm.startDate" name="startDate" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label>End Date</label>
+            <div class="end-date-container">
+              <input type="date" [(ngModel)]="medicationForm.endDate" name="endDate" 
+                     class="form-control" [disabled]="medicationForm.noEndDate">
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="medicationForm.noEndDate" name="noEndDate">
+                No end date
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea [(ngModel)]="medicationForm.notes" name="notes" class="form-control" rows="3"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="cancel-button" (click)="closeAddModal()">Cancel</button>
+            <button type="submit" class="submit-button">Add Medication</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

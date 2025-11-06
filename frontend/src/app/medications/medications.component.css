@@ -1,0 +1,249 @@
+.medications-container {
+  padding: 0;
+}
+
+.medications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-button {
+  background: #306afc;
+  color: white;
+  border: none;
+  padding: 20px 20px;
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.medications-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1200px;
+}
+
+.medications-table th {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  background-color: #f5f5f5;
+}
+
+.medications-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.medications-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.actions-cell {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.action-button {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.action-button:hover {
+  background: #a5f49b;
+  border-color: #2cda26;
+}
+
+.delete-button {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.delete-button:hover {
+  background: #f57c8ebf;
+  border-color: #ff4356;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+.notes-cell {
+  white-space: nowrap;
+}
+
+.notes-button {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 10px;
+}
+
+.notes-button:hover {
+  background: #ffe785;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border: 1px solid #ddd;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body p {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.add-modal {
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.form-control:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.dosage-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.dosage-amount {
+  flex: 0 0 120px;
+}
+
+.dosage-units {
+  flex: 1;
+}
+
+.times-container {
+  margin-bottom: 8px;
+}
+
+.time-input {
+  width: 100%;
+}
+
+.end-date-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+textarea.form-control {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.cancel-button {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.submit-button {
+  background: #306afc;
+  color: white;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 10px;
+}

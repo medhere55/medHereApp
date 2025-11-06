@@ -1,0 +1,34 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <button id="prevMonth">&lt;</button>
+    <h2 id="monthYear"></h2>
+    <button id="nextMonth">&gt;</button>
+  </div>
+
+  <table class="calendar-grid">
+    <thead>
+      <tr>
+        <th>Sun</th>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td *ngFor="let day of days">
+          <div class="day-number">{{ day.date }}</div>
+          <ul class="med-list">
+            <li *ngFor="let med of getMedsForDay(day.date)">
+              <span class="med-dot" [style.backgroundColor]="getMedColor(med)"></span>
+              {{ med }}
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

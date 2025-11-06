@@ -1,0 +1,21 @@
+<main>
+    <div *ngIf="isLoggedIn">
+        <header class="brand-header">
+            <img class="brand-logo" src="/assets/medhere-logo.png" alt="logo" height="60px" aria-hidden="true">
+            <div class="user-info">
+                <span class="user-name">{{ currentUser?.name }}</span>
+                <button class="logout-button" (click)="logout()">Logout</button>
+            </div>
+        </header>
+        <nav class="main-nav">
+            <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+            <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+            <a routerLink="/medications" routerLinkActive="active">Medications</a>
+            <a routerLink="/calendar" routerLinkActive="active">Calendar</a>
+            <a routerLink="/settings" routerLinkActive="active">Settings</a>
+        </nav>
+    </div>
+    <section class="content">
+        <router-outlet></router-outlet>
+    </section>
+</main>

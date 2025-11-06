@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "name": "Aisha Khan",
+    "username": "akhan"
+  },
+  {
+    "id": 2,
+    "name": "Brandon Cohen",
+    "username": "bcohen"
+  },
+  {
+    "id": 3,
+    "name": "Carlos Rivera",
+    "username": "crivera"
+  },
+  {
+    "id": 4,
+    "name": "Diana Okafor",
+    "username": "dokafor"
+  },
+  {
+    "id": 5,
+    "name": "Ethan Park",
+    "username": "epark"
+  }
+]

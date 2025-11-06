@@ -1,0 +1,72 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:20b45a0e-2c74-a709-11fb-42b8b76329c0",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "20b45a0e-2c74-a709-11fb-42b8b76329c0",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "477045",
+              "display": "Chlorpheniramine Maleate 2 MG/ML Oral Solution"
+            }
+          ],
+          "text": "Chlorpheniramine Maleate 2 MG/ML Oral Solution"
+        },
+        "subject": {
+          "reference": "urn:uuid:20b45a0e-2c74-a709-912b-1ff2c2c0dc08"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:20b45a0e-2c74-a709-e05a-cfe26d892790",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "20b45a0e-2c74-a709-e05a-cfe26d892790",
+        "status": "completed",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "310798",
+              "display": "Hydrochlorothiazide 25 MG Oral Tablet"
+            }
+          ],
+          "text": "Hydrochlorothiazide 25 MG Oral Tablet"
+        },
+        "subject": {
+          "reference": "urn:uuid:20b45a0e-2c74-a709-912b-1ff2c2c0dc08"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:20b45a0e-2c74-a709-ad63-181e2e36c5f6",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "20b45a0e-2c74-a709-ad63-181e2e36c5f6",
+        "status": "completed",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "314076",
+              "display": "lisinopril 10 MG Oral Tablet"
+            }
+          ],
+          "text": "lisinopril 10 MG Oral Tablet"
+        },
+        "subject": {
+          "reference": "urn:uuid:20b45a0e-2c74-a709-912b-1ff2c2c0dc08"
+        }
+      }
+    }
+  ]
+}
