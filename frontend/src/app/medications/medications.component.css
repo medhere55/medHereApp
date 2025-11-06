@@ -209,12 +209,19 @@
   align-items: center;
 }
 
+.end-date-container .form-control {
+  flex: 1;
+  min-width: 0;
+}
+
 .checkbox-label {
   display: flex;
   align-items: center;
   gap: 5px;
   cursor: pointer;
   font-weight: normal;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 textarea.form-control {

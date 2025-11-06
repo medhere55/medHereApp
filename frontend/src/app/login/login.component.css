@@ -1,37 +1,53 @@
 .login-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #76abf0 0%, #306afc 100%);
-  padding: 20px;
+  background: #ffffff;
 }
 
-.login-card {
+.login-left {
+  flex: 1;
   background: white;
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 40px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 450px;
+  border-radius: 10px;
 }
 
-.login-header {
+.brand-section {
   text-align: center;
-  margin-bottom: 30px;
 }
 
-.login-header h1 {
-  margin: 15px 0 10px 0;
-  color: #333;
+.brand-logo {
+  display: block;
+}
+
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-form-container h2 {
+  margin: 0 0 8px 0;
   font-size: 28px;
   font-weight: 600;
+  color: #2c3e50;
 }
 
-.subtitle {
-  color: #666;
+.form-subtitle {
+  color: #7f8c8d;
   font-size: 14px;
-  margin: 0;
+  margin: 0 0 32px 0;
 }
 
 .login-form {
@@ -48,14 +64,14 @@
 
 .form-group label {
   font-weight: 500;
-  color: #333;
+  color: #2c3e50;
   font-size: 14px;
 }
 
 .form-control {
   padding: 12px;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   transition: border-color 0.3s ease;
   background-color: #fff;
@@ -74,17 +90,17 @@ select.form-control {
   background-color: #ffebee;
   color: #c62828;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   text-align: center;
 }
 
 .login-button {
-  background: linear-gradient(135deg, #76abf0 0%, #306afc 100%);
+transition: border-color 0.3s ease;  background: #2c3e50;
   color: white;
   border: none;
   padding: 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -93,12 +109,13 @@ select.form-control {
 }
 
 .login-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  background: #4ea7ff;
+  border-color: #34495e;
 }
 
 .login-button:active {
-  transform: translateY(0);
+  background: #1a252f;
+  border-color: #1a252f;
 }
 
 .login-info {
