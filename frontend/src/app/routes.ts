@@ -3,7 +3,6 @@ import { HomeComponent } from "./home/home.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import { MedicationsComponent } from "./medications/medications.component";
 import { CalendarComponent } from "./calendar/calendar.component";
-import { SettingsComponent } from "./settings/settings.component";
 import { LoginComponent } from "./login/login.component";
 
 const routeConfig: Routes = [
@@ -31,11 +30,6 @@ const routeConfig: Routes = [
         path: 'calendar',
         component: CalendarComponent,
         title: 'Calendar'
-    },
-    {
-        path: 'settings',
-        component: SettingsComponent,
-        title: 'Settings'
     }
 ];
 

@@ -24,3 +24,5 @@
 - https://angular.dev/tutorials/first-app
 - https://tailwindcss.com/plus/ui-blocks/application-ui/forms/sign-in-forms
 - https://jasonwatmore.com/post/2022/11/29/angular-14-user-registration-and-login-example-tutorial
+- https://www.geeksforgeeks.org/css/create-responsive-column-cards-with-css/
+- https://www.w3schools.com/howto/howto_css_cards.asp

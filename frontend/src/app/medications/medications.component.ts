@@ -71,7 +71,7 @@ export class MedicationsComponent implements OnInit {
         dosageUnit: 'mg',
         form: 'tablet',
         reason: 'Back pain',
-        frequency: 'Once daily',
+        frequency: 'Twice daily',
         times: ['08:00', '20:00'],
         startDate: '2025-01-01',
         endDate: '2025-12-31',
@@ -133,7 +133,9 @@ export class MedicationsComponent implements OnInit {
 
   formatDate(dateStr: string): string {
     if (!dateStr) return '';
-    const date = new Date(dateStr);
+    // Use local time to fix off by one errors
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 

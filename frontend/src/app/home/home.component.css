@@ -1,0 +1,74 @@
+.hero-section {
+  text-align: center;
+  margin-bottom: 75px;
+}
+
+.hero-section h1 {
+  font-size: 45px;
+  font-weight: 700;
+  color: #282b2e;
+}
+
+.tagline {
+  font-size: 20px;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+.info-section {
+  margin-bottom: 50px;
+  padding: 30px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.info-section h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.info-section p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.feature-card {
+  padding: 24px;
+  border-bottom: 4px solid #e0e0e0;
+  transition: border-color 0.3s;
+}
+
+.feature-card:hover {
+  border-bottom-color: #306afc;
+}
+
+.feature-card h3 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.feature-card p {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.feature-link {
+  text-decoration: none;
+  color: #306afc;
+  font-weight: 500;
+}
+
+.feature-link:hover {
+  text-decoration: underline;
+}

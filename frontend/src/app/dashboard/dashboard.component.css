@@ -1,0 +1,112 @@
+.med-checker {
+  max-width: 520px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.placeholder {
+  opacity: 0.7;
+}
+
+.error {
+  color: #b00020;
+  margin-bottom: 0.5rem;
+}
+
+.empty {
+  color: #666;
+}
+
+.med-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.med-list li {
+  display: block;
+  padding: 0.6rem;
+  border-radius: 8px;
+  margin-bottom: 0.4rem;
+  background: #f7f7f8;
+  transition: transform .12s ease;
+}
+
+.med-list li.taken {
+  opacity: 0.6;
+  text-decoration: line-through;
+  background: #eef7ee;
+}
+
+.med-list label {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  cursor: pointer;
+}
+
+.med-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.med-name {
+  font-weight: 600;
+}
+
+.med-meta {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.actions {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions button {
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+.refill-reminder {
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.refill-reminder h3 {
+  margin: 0 0 0.4rem 0;
+  font-size: 1rem;
+  color: #a67c00;
+}
+.refill-reminder ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.refill-reminder li {
+  font-size: 0.9rem;
+  color: #795548;
+}
+
+.med-list li.missed {
+  border: 1px solid #fbc02d;
+  background: #fff3e0;
+}
+
+.warning {
+  color: #d84315;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
