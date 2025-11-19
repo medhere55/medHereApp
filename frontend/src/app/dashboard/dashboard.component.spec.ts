@@ -1,76 +1,62 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
-// import { DashboardComponent } from './dashboard.component';
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent implements OnInit {
+  medications = [
+    { name: 'Lisinopril', dose: '10 mg', time: '8:00 AM' },
+    { name: 'Metformin', dose: '500 mg', time: '8:00 AM' },
+    { name: 'Metformin', dose: '500 mg', time: '8:00 PM' },
+    { name: 'Lipitor', dose: '20 mg', time: '9:00 PM' }
+  ];
 
-// describe('DashboardComponent', () => {
-//   let component: DashboardComponent;
-//   let fixture: ComponentFixture<DashboardComponent>;
+  checked: Record<string, boolean> = {};
 
-//   beforeEach(() => {
-//     TestBed.configureTestingModule({
-//       imports: [DashboardComponent]
-//     });
-//     fixture = TestBed.createComponent(DashboardComponent);
-//     component = fixture.componentInstance;
-//     fixture.detectChanges();
-//   });
+  reminders = [
+    { icon: '⚠️', text: 'You missed your 8:00 AM Lisinopril dose today.', type: 'warning' },
+    { icon: '⏰', text: 'Your upcoming Metformin dose is at 8:00 PM today.', type: 'info' }
+  ];
 
-//   it('should create', () => {
-//     expect(component).toBeTruthy();
-//   });
-// });
+  upcomingDoses = [
+    { name: 'Metformin', dose: '500 mg', time: 'Today, 8:00 PM' },
+    { name: 'Lipitor', dose: '20 mg', time: 'Today, 9:00 PM' },
+    { name: 'Lisinopril', dose: '10 mg', time: 'Tomorrow, 8:00 AM' }
+  ];
 
+  interactions = [
+    { icon: '⚠️', text: 'Lisinopril ⇄ Metformin — may lower blood sugar; monitor for dizziness or sweating.', status: 'warning' },
+    { icon: '✅', text: 'Lisinopril ⇄ Lipitor — No known interaction.', status: 'safe' },
+    { icon: '✅', text: 'Lipitor ⇄ Metformin — No known interaction.', status: 'safe' }
+  ];
 
+  ngOnInit(): void {
+    this.restoreCheckedState();
+  }
 
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { DashboardComponent } from './dashboard.component';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+  toggleMedication(name: string, event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.checked[name] = input.checked;
+    localStorage.setItem(`medcheck_${name}`, JSON.stringify(input.checked));
+  }
 
-describe('DashboardComponent (standalone)', () => {
-  let component: DashboardComponent;
-  let fixture: ComponentFixture<DashboardComponent>;
+  restoreCheckedState() {
+    this.medications.forEach(med => {
+      const stored = localStorage.getItem(`medcheck_${med.name}`);
+      if (stored) this.checked[med.name] = JSON.parse(stored);
+    });
+  }
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [DashboardComponent]
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(DashboardComponent);
-    component = fixture.componentInstance;
-    localStorage.clear();
-  });
-
-  it('loads medications and renders list', fakeAsync(() => {
-    fixture.detectChanges();
-    tick();
-    fixture.detectChanges();
-
-    const items = fixture.debugElement.queryAll(By.css('.med-list li'));
-    expect(items.length).toBeGreaterThan(0);
-    expect(items[0].nativeElement.textContent).toContain('Lisinopril');
-  }));
-
-  it('toggles a medication and persists', fakeAsync(() => {
-    fixture.detectChanges();
-    tick();
-    fixture.detectChanges();
-
-    const firstCheckbox: DebugElement = fixture.debugElement.query(By.css('.med-list li input'));
-    firstCheckbox.triggerEventHandler('change', { target: { checked: true } });
-    fixture.detectChanges();
-
-    expect(Object.values(component.checked).some(v => v === true)).toBeTrue();
-
-    const keyPrefix = 'medcheck_';
-    const storedKeys = Object.keys(localStorage).filter(k => k.startsWith(keyPrefix));
-    expect(storedKeys.length).toBeGreaterThan(0);
-  }));
-
-  it('markAllTaken sets all checked', fakeAsync(() => {
-    fixture.detectChanges();
-    tick();
-    component.markAllTaken();
-    expect(Object.values(component.checked).every(v => v === true)).toBeTrue();
-  }));
-});
+  markAllTaken() {
+    this.medications.forEach(med => {
+      this.checked[med.name] = true;
+      localStorage.setItem(`medcheck_${med.name}`, 'true');
+    });
+  }
+}

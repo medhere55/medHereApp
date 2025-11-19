@@ -26,3 +26,5 @@
 - https://jasonwatmore.com/post/2022/11/29/angular-14-user-registration-and-login-example-tutorial
 - https://www.geeksforgeeks.org/css/create-responsive-column-cards-with-css/
 - https://www.w3schools.com/howto/howto_css_cards.asp
+- https://dev.to/railsstudent/synchronize-data-with-local-storage-using-rxjs-and-angular-21mf
+- https://medium.com/@monsieur_ricky/simplifying-local-storage-management-in-angular-733a791d6d84

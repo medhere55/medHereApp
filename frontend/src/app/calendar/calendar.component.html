@@ -1,32 +1,90 @@
 <div class="calendar-container">
-  <div class="calendar-header">
-    <button id="prevMonth">&lt;</button>
-    <h2 id="monthYear"></h2>
-    <button id="nextMonth">&gt;</button>
+  <!-- 🔹 Navigation bar -->
+  <div class="nav">
+    <button (click)="prevPeriod()">&lt;</button>
+
+    <div class="month-label">
+      <!-- Show appropriate label depending on view -->
+      <ng-container [ngSwitch]="viewMode">
+        <span *ngSwitchCase="'day'">{{ currentDay | date: 'MMMM d, yyyy' }}</span>
+        <span *ngSwitchCase="'week'">{{ currentWeekStart | date: 'MMMM yyyy' }}</span>
+        <span *ngSwitchCase="'month'">{{ currentMonth | date: 'MMMM yyyy' }}</span>
+      </ng-container>
+    </div>
+
+    <button (click)="nextPeriod()">&gt;</button>
   </div>
 
-  <table class="calendar-grid">
+  <!-- 🔹 View mode selector -->
+  <div class="view-selector">
+    <button (click)="viewMode = 'day'" [class.active]="viewMode === 'day'">Day</button>
+    <button (click)="viewMode = 'week'" [class.active]="viewMode === 'week'">Week</button>
+    <button (click)="viewMode = 'month'" [class.active]="viewMode === 'month'">Month</button>
+  </div>
+
+  <!-- 🔹 DAY VIEW -->
+  <div *ngIf="viewMode === 'day'" class="day-view">
+    <h2>{{ currentDay | date: 'fullDate' }}</h2>
+    <div class="day-content">
+      <div *ngFor="let med of getMedsForDay({ 
+                      date: currentDay.getDate(), 
+                      fullDate: currentDay.toISOString().split('T')[0], 
+                      jsDate: currentDay 
+                    })"
+           class="medication"
+           [style.backgroundColor]="getMedColor(med)">
+        {{ med }}
+      </div>
+
+      <div *ngIf="getMedsForDay({ 
+                      date: currentDay.getDate(), 
+                      fullDate: currentDay.toISOString().split('T')[0], 
+                      jsDate: currentDay 
+                    }).length === 0" class="no-meds">
+        No medications scheduled today.
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔹 WEEK VIEW -->
+  <table *ngIf="viewMode === 'week'" class="calendar-table week-view">
     <thead>
       <tr>
-        <th>Sun</th>
-        <th>Mon</th>
-        <th>Tue</th>
-        <th>Wed</th>
-        <th>Thu</th>
-        <th>Fri</th>
-        <th>Sat</th>
+        <th *ngFor="let day of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']">{{ day }}</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td *ngFor="let day of days">
+        <td *ngFor="let day of days"
+            [ngClass]="{ 'today': isToday(day), 'past': isPastDay(day) }">
           <div class="day-number">{{ day.date }}</div>
-          <ul class="med-list">
-            <li *ngFor="let med of getMedsForDay(day.date)">
-              <span class="med-dot" [style.backgroundColor]="getMedColor(med)"></span>
-              {{ med }}
-            </li>
-          </ul>
+          <div *ngFor="let med of getMedsForDay(day)"
+               class="medication"
+               [style.backgroundColor]="getMedColor(med)">
+            {{ med }}
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 🔹 MONTH VIEW -->
+  <table *ngIf="viewMode === 'month'" class="calendar-table month-view">
+    <thead>
+      <tr>
+        <th *ngFor="let day of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']">{{ day }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let week of monthDays">
+        <td *ngFor="let day of week"
+            [ngClass]="{ 'today': isToday(day), 'past': isPastDay(day) }">
+          <div class="day-number">{{ day.date }}</div>
+          <div *ngFor="let med of getMedsForDay(day)"
+               class="medication"
+               [style.backgroundColor]="getMedColor(med)">
+            {{ med }}
+          </div>
         </td>
       </tr>
     </tbody>

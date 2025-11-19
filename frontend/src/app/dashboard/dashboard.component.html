@@ -1,45 +1,47 @@
-<div class="refill-reminder" *ngIf="getRefillSoonList().length > 0">
-  <h3>Refill reminders</h3>
-  <ul>
-    <li *ngFor="let med of getRefillSoonList()">
-      ⚠️ {{ med.name }} — refill by {{ med.refillDate | date:'mediumDate' }}
-    </li>
-  </ul>
-</div>
+<div class="dashboard-grid">
 
-<br>
+  <!-- Today's Medications -->
+  <section class="quadrant medications">
+    <h2>Today's Medications</h2>
+    <ul>
+      <li *ngFor="let med of medications" class="medication-item">
+        <input type="checkbox" (change)="toggleMedication(med.name, $event)" />
+        <label>{{ med.name }} - {{ med.dose }}</label>
+        <span class="med-time">{{ med.time }}</span>
+      </li>
+    </ul>
+    <button (click)="markAllTaken()">Mark all taken</button>
+  </section>
 
-<div class="med-checker">
-  <h2>Medications for today</h2>
+  <!-- Reminders -->
+  <section class="quadrant reminders">
+    <h2>Reminders</h2>
+    <div *ngFor="let reminder of reminders" class="reminder" [ngClass]="reminder.type">
+      <span class="reminder-icon">{{ reminder.icon }}</span>
+      <span class="reminder-text">{{ reminder.text }}</span>
+    </div>
+  </section>
 
-  <div *ngIf="loading" class="placeholder">Loading…</div>
-  <div *ngIf="error" class="error">{{ error }}</div>
+  <!-- Upcoming Doses -->
+  <section class="quadrant doses">
+    <h2>Upcoming Doses</h2>
+    <ul>
+      <li *ngFor="let dose of upcomingDoses">
+        <span>{{ dose.name }} - {{ dose.dose }}</span>
+        <span class="dose-time">{{ dose.time }}</span>
+      </li>
+    </ul>
+  </section>
 
-  <div *ngIf="!loading && medications.length === 0" class="empty">
-    No medications scheduled for today.
-  </div>
+  <!-- Drug Interactions -->
+  <section class="quadrant interactions">
+    <h2>Drug Interactions</h2>
+    <ul>
+      <li *ngFor="let interaction of interactions" [ngClass]="interaction.status">
+        <span class="interaction-icon">{{ interaction.icon }}</span>
+        {{ interaction.text }}
+      </li>
+    </ul>
+  </section>
 
-  <ul class="med-list" *ngIf="!loading && medications.length > 0">
-    <li *ngFor="let med of medications" [class.taken]="checked[med.id]" [class.missed]="isMissed(med)">
-      <label>
-        <input type="checkbox" [checked]="checked[med.id]" (change)="toggle(med)" />
-        <div class="med-info">
-          <div class="med-name">{{ med.name }}</div>
-          <div class="med-meta">
-            {{ med.dose || '' }}
-            <span *ngIf="med.scheduleTime">• {{ med.scheduleTime }}</span>
-          </div>
-        </div>
-      </label>
-      <div *ngIf="isMissed(med)" class="warning">
-        ⚠️ Missed dose — scheduled for {{ med.scheduleTime }}
-      </div>
-    </li>
-  </ul>
-
-  <div class="actions" *ngIf="!loading && medications.length > 0">
-    <button type="button" (click)="markAllTaken()">Mark all taken</button>
-    <button type="button" (click)="clearToday()">Clear</button>
-    <button type="button" (click)="fetchForToday()">Refresh</button>
-  </div>
 </div>
