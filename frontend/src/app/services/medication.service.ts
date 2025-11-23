@@ -25,16 +25,24 @@ export class MedicationService {
   private medicationsSubject = new BehaviorSubject<Medication[]>([]);
   public medications$: Observable<Medication[]> = this.medicationsSubject.asObservable();
 
+  // FHIR server base URL & shared patient ID
+  private fhirBase = "https://hapi.fhir.org/baseR4";
+  private patientId = "group55-sharedpatient";
+  private hasLoadedFromFHIR = false;
+
   constructor(private authService: AuthService) {
     if (this.authService.isLoggedIn()) {
       this.refresh();
+      this.loadMedicationsFromFHIRIfNeeded();
     }
 
     this.authService.currentUser$.subscribe(() => {
       if (this.authService.isLoggedIn()) {
         this.refresh();
+        this.loadMedicationsFromFHIRIfNeeded();
       } else {
         this.medicationsSubject.next([]);
+        this.hasLoadedFromFHIR = false;
       }
     });
   }
@@ -65,6 +73,114 @@ export class MedicationService {
 
   refresh(): void {
     this.medicationsSubject.next(this.getMedications());
+  }
+
+  loadMedicationsFromFHIRIfNeeded(): void {
+    // Only load from FHIR once, and only if no medications exist
+    if (this.hasLoadedFromFHIR) {
+      return;
+    }
+
+    const existingMeds = this.getMedications();
+    if (existingMeds.length > 0) {
+      this.hasLoadedFromFHIR = true;
+      return;
+    }
+
+    this.loadMedicationsFromFHIR();
+  }
+
+  private loadMedicationsFromFHIR(): void {
+    fetch(
+      `${this.fhirBase}/MedicationRequest?patient=${this.patientId}&status=active&_pretty=true`
+    )
+      .then((result) => result.json())
+      .then((data) => {
+        if (!data.entry || data.entry.length === 0) {
+          console.warn("No medications found from FHIR!");
+          this.hasLoadedFromFHIR = true;
+          return;
+        }
+
+        const fhirMedications = data.entry.map((entry: any, index: number) => {
+          const r = entry.resource;
+          const medConcept = r.medicationCodeableConcept;
+
+          // medication name
+          const medName =
+            medConcept?.text ||
+            medConcept?.coding?.[0]?.display ||
+            "(Unknown medication)";
+
+          // dosage info
+          const dose = r.dosageInstruction?.[0];
+          const doseQuantity = dose?.doseAndRate?.[0]?.doseQuantity;
+          const dosageAmount = doseQuantity?.value || 0;
+          const dosageUnit = doseQuantity?.unit || "mg";
+
+          // frequency
+          const repeat = dose?.timing?.repeat;
+          const asNeeded = dose?.asNeededBoolean || false;
+          let frequency = "Once daily";
+          if (asNeeded) frequency = "As needed";
+          else if (repeat?.frequency === 2) frequency = "Twice daily";
+          else if (repeat?.frequency === 3) frequency = "Three times daily";
+          else if (repeat?.frequency === 4) frequency = "Four times daily";
+
+          // times
+          const times = repeat?.timeOfDay || [];
+
+          // reason
+          const reason = r.reasonCode?.[0]?.text || "";
+
+          // start date / end date / no end date
+          const startDate = repeat?.boundsPeriod?.start || "";
+          const endDate = repeat?.boundsPeriod?.end || "";
+          const noEndDate = !endDate;
+
+          // notes
+          const notes = dose?.additionalInstruction?.[0]?.text || "";
+
+          // ignore this
+          let frequencyDisplay = frequency;
+
+          // formatting dates for readability - not used due to error with other formatDate function**
+          const formatDate = (d: string) => {
+            if (!d) return "";
+            const date = new Date(d);
+            return date.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            });
+          };
+
+          return {
+            id: index + 1,
+            name: medName,
+            dosageAmount,
+            dosageUnit,
+            form: "Tablet",
+            reason,
+            frequency,
+            times,
+            startDate,
+            endDate: endDate ? endDate : "",
+            noEndDate,
+            notes,
+          } as Medication;
+        });
+
+        this.saveMedications(fhirMedications);
+        this.hasLoadedFromFHIR = true;
+        console.log(
+          "Medications loaded successfully from FHIR!",
+          fhirMedications
+        );
+      })
+      .catch((err) => {
+        console.error("Medication loading failed", err);
+      });
   }
 }
 

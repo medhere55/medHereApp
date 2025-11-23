@@ -20,10 +20,6 @@ export class MedicationsComponent implements OnInit, OnDestroy {
   editingMedicationId: number | null = null;
   private medicationsSubscription?: Subscription;
 
-  // FHIR server base URL & shared patient ID
-  private fhirBase = "https://hapi.fhir.org/baseR4";
-  private patientId = "group55-sharedpatient";
-
   // Form data
   medicationForm = {
     name: "",
@@ -55,11 +51,6 @@ export class MedicationsComponent implements OnInit, OnDestroy {
     
     // Load data from medicationService
     this.medications = this.medicationService.getMedications();
-    
-    // Only load from FHIR medications on initial load
-    if (this.medications.length === 0) {
-      this.loadMedicationsFromFHIR();
-    }
   }
 
   ngOnDestroy(): void {
@@ -74,104 +65,6 @@ export class MedicationsComponent implements OnInit, OnDestroy {
   closeNotesModal(): void {
     this.showNotesModal = false;
     this.selectedMedication = null;
-  }
-
-  // load our medication data from public FHIR server
-  loadMedicationsFromFHIR(): void {
-    fetch(
-      `${this.fhirBase}/MedicationRequest?patient=${this.patientId}&status=active&_pretty=true`
-    )
-      .then((result) => result.json())
-      .then((data) => {
-        if (!data.entry || data.entry.length === 0) {
-          console.warn("No medications found from FHIR!");
-          return;
-        }
-
-        const fhirMedications = data.entry.map((entry: any, index: number) => {
-          const r = entry.resource;
-          const medConcept = r.medicationCodeableConcept;
-
-          // medication name
-          const medName =
-            medConcept?.text ||
-            medConcept?.coding?.[0]?.display ||
-            "(Unknown medication)";
-
-          // dosage info
-          const dose = r.dosageInstruction?.[0];
-          const doseQuantity = dose?.doseAndRate?.[0]?.doseQuantity;
-          const dosageAmount = doseQuantity?.value || 0;
-          const dosageUnit = doseQuantity?.unit || "mg";
-
-          // frequency
-          const repeat = dose?.timing?.repeat;
-          const asNeeded = dose?.asNeededBoolean || false;
-          let frequency = "Once daily";
-          if (asNeeded) frequency = "As needed";
-          else if (repeat?.frequency === 2) frequency = "Twice daily";
-          else if (repeat?.frequency === 3) frequency = "Three times daily";
-          else if (repeat?.frequency === 4) frequency = "Four times daily";
-
-          // times
-          const times = repeat?.timeOfDay || [];
-
-          // reason
-          const reason = r.reasonCode?.[0]?.text || "";
-
-          // start date / end date / no end date
-          const startDate = repeat?.boundsPeriod?.start || "";
-          const endDate = repeat?.boundsPeriod?.end || "";
-          const noEndDate = !endDate;
-
-          // notes
-          const notes = dose?.additionalInstruction?.[0]?.text || "";
-
-          // ignore this
-          let frequencyDisplay = frequency;
-
-          // formatting dates for readability - not used due to error with other formatDate function**
-          const formatDate = (d: string) => {
-            if (!d) return "";
-            const date = new Date(d);
-            return date.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            });
-          };
-
-          return {
-            id: index + 1,
-            name: medName,
-            dosageAmount,
-            dosageUnit,
-            form: "Tablet",
-            reason,
-            frequency,
-            times,
-            startDate,
-            endDate: endDate ? endDate : "",
-            noEndDate,
-            notes,
-          } as Medication;
-        });
-
-        // Merge FHIR medications with existing local medications
-        const existingMeds = this.medicationService.getMedications();
-        const existingIds = new Set(existingMeds.map((m: Medication) => m.id));        
-        const newFhirMeds = fhirMedications.filter((fhir: Medication) => !existingIds.has(fhir.id));
-        const mergedMedications = [...newFhirMeds, ...existingMeds];
-
-        this.medicationService.saveMedications(mergedMedications);
-        console.log(
-          "Medications loaded successfully from FHIR and merged with local!",
-          mergedMedications
-        );
-      })
-      .catch((err) => {
-        console.error("Medication loading failed", err);
-      });
   }
 
   formatDosage(med: Medication): string {
