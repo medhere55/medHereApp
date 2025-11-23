@@ -89,24 +89,80 @@
 }
 
 .medication {
-  display: inline-block;
+  display: flex;
+  align-items: center;
   margin: 2px 0;
-  padding: 2px 6px;
+  padding: 2px 4px;
   border-radius: 6px;
-  color: #000;
   font-size: 12px;
-  background-color: #ccc;
 }
 
-/* Month grid adjustment */
+.med-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
 .month-view td {
   height: 90px;
 }
 
-/* Day view styling */
 .day-view {
-  text-align: center;
+  text-align: left;
 }
-.day-view h2 {
-  margin-bottom: 10px;
+
+.day-view .hour {
+  display: flex;
+  flex-direction: row;       /* horizontal layout */
+  align-items: flex-start;
+  gap: 10px;                 /* space between time label and meds */
+  margin-bottom: 6px;
+  padding: 6px 8px;
+  border-left: 3px solid transparent; 
+  border-radius: 4px;
+  transition: background 0.2s, border-left 0.2s;
+}
+
+.day-view .hour:hover {
+  background-color: #f5f5f5;
+  border-left: 3px solid #4285f4;
+}
+
+.day-view .hour-label {
+  font-weight: bold;
+  font-size: 12px;
+  color: #555;
+  min-width: 50px; /* ensures meds align neatly */
+}
+
+.day-view .medications-container {
+  display: flex;
+  flex-direction: column; /* stack meds vertically */
+  flex: 1;                /* take remaining horizontal space */
+  gap: 4px;
+}
+
+.day-view .medication {
+  background-color: #e8f0fe; /* light blue background */
+  border-left: 3px solid #4285f4; 
+  padding: 4px 6px; 
+  margin: 3px 0; 
+  font-size: 12px;
+  border-radius: 4px;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.day-view .medication:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.day-view .med-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { Subscription } from "rxjs";
@@ -41,15 +41,25 @@ export class MedicationsComponent implements OnInit, OnDestroy {
     notes: "",
   };
 
-  constructor(private medicationService: MedicationService) {}
+  constructor(
+    private medicationService: MedicationService,
+    private cd: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.loadMedicationsFromFHIR();
-    this.medications = this.medicationService.getMedications();
     this.medicationsSubscription =
       this.medicationService.medications$.subscribe((meds) => {
-        this.medications = meds;
+        this.medications = [...meds];
+        this.cd.detectChanges();
       });
+    
+    // Load data from medicationService
+    this.medications = this.medicationService.getMedications();
+    
+    // Only load from FHIR medications on initial load
+    if (this.medications.length === 0) {
+      this.loadMedicationsFromFHIR();
+    }
   }
 
   ngOnDestroy(): void {
@@ -74,12 +84,11 @@ export class MedicationsComponent implements OnInit, OnDestroy {
       .then((result) => result.json())
       .then((data) => {
         if (!data.entry || data.entry.length === 0) {
-          console.warn("No medications found!");
-          this.medications = [];
+          console.warn("No medications found from FHIR!");
           return;
         }
 
-        this.medications = data.entry.map((entry: any, index: number) => {
+        const fhirMedications = data.entry.map((entry: any, index: number) => {
           const r = entry.resource;
           const medConcept = r.medicationCodeableConcept;
 
@@ -139,7 +148,7 @@ export class MedicationsComponent implements OnInit, OnDestroy {
             dosageUnit,
             form: "Tablet",
             reason,
-            frequency: frequencyDisplay,
+            frequency,
             times,
             startDate,
             endDate: endDate ? endDate : "",
@@ -148,14 +157,20 @@ export class MedicationsComponent implements OnInit, OnDestroy {
           } as Medication;
         });
 
+        // Merge FHIR medications with existing local medications
+        const existingMeds = this.medicationService.getMedications();
+        const existingIds = new Set(existingMeds.map((m: Medication) => m.id));        
+        const newFhirMeds = fhirMedications.filter((fhir: Medication) => !existingIds.has(fhir.id));
+        const mergedMedications = [...newFhirMeds, ...existingMeds];
+
+        this.medicationService.saveMedications(mergedMedications);
         console.log(
-          "Medications loaded successfully from FHIR!",
-          this.medications
+          "Medications loaded successfully from FHIR and merged with local!",
+          mergedMedications
         );
       })
       .catch((err) => {
         console.error("Medication loading failed", err);
-        this.medications = [];
       });
   }
 
@@ -379,14 +394,14 @@ export class MedicationsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const updatedMedication = this.createMedicationFromForm(
-      this.editingMedicationId!
-    );
     const index = this.medications.findIndex(
       (m) => m.id === this.editingMedicationId!
     );
 
     if (index !== -1) {
+      const updatedMedication = this.createMedicationFromForm(
+        this.editingMedicationId!
+      );
       const updatedMeds = [...this.medications];
       updatedMeds[index] = updatedMedication;
       this.medicationService.saveMedications(updatedMeds);
