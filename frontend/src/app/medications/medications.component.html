@@ -1,7 +1,12 @@
 <div class="medications-container">
   <div class="medications-header">
     <h1>Medication List</h1>
-    <button class="add-button" (click)="openAddModal()">Add Medication</button>
+    <div>
+      <button class="interaction-button" (click)="checkInteractions()" [disabled]="medications.length < 2">
+        Check Interactions
+      </button>
+      <button class="add-button" (click)="openAddModal()">Add Medication</button>
+    </div>
   </div>
 
   <div class="table-container">
@@ -47,6 +52,46 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Interaction Check Modal -->
+  <div class="modal-overlay" *ngIf="showInteractionModal" (click)="closeInteractionModal()">
+    <div class="modal-content interaction-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Medication Interaction Check</h2>
+        <button class="close-button" (click)="closeInteractionModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="isCheckingInteractions" class="loading-container">
+          <div class="spinner"></div>
+          <p>Checking for interactions...</p>
+        </div>
+
+        <div *ngIf="interactionError" class="error-container">
+          <h3>Error</h3>
+          <p>{{ interactionError }}</p>
+        </div>
+
+        <div *ngIf="interactionResult">
+          <div *ngIf="interactionResult.interactions.length === 0" class="no-interactions-found">
+            <p>No clinically significant interactions were found among the current medications.</p>
+          </div>
+
+          <div *ngIf="interactionResult.interactions.length > 0">
+            <h3>Potential Interactions Found:</h3>
+            <ul class="interaction-list">
+              <li *ngFor="let interaction of interactionResult.interactions" [ngClass]="'severity-' + interaction.severity">
+                <div class="interaction-header">
+                  <strong>{{ interaction.drugs.join(' & ') }}</strong>
+                  <span class="severity-badge">{{ interaction.severity | uppercase }}</span>
+                </div>
+                <p>{{ interaction.description }}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Notes Modal -->
