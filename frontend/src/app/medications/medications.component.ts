@@ -2,7 +2,11 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { Subscription } from "rxjs";
-import { MedicationService, Medication } from "../services/medication.service";
+import {
+  MedicationService,
+  Medication,
+  InteractionResponse,
+} from "../services/medication.service";
 
 @Component({
   selector: "app-medications",
@@ -19,6 +23,12 @@ export class MedicationsComponent implements OnInit, OnDestroy {
   showEditModal: boolean = false;
   editingMedicationId: number | null = null;
   private medicationsSubscription?: Subscription;
+
+  // For interaction checker
+  showInteractionModal = false;
+  interactionResult: InteractionResponse | null = null;
+  isCheckingInteractions = false;
+  interactionError: string | null = null;
 
   // Form data
   medicationForm = {
@@ -65,6 +75,41 @@ export class MedicationsComponent implements OnInit, OnDestroy {
   closeNotesModal(): void {
     this.showNotesModal = false;
     this.selectedMedication = null;
+  }
+
+  // Methods for interaction modal
+  openInteractionModal(): void {
+    this.showInteractionModal = true;
+  }
+
+  closeInteractionModal(): void {
+    this.showInteractionModal = false;
+    this.interactionResult = null;
+    this.interactionError = null;
+  }
+
+  checkInteractions(): void {
+    if (this.medications.length < 2) {
+      alert("You need at least two medications to check for interactions.");
+      return;
+    }
+
+    this.isCheckingInteractions = true;
+    this.interactionError = null;
+    this.interactionResult = null;
+    this.openInteractionModal();
+
+    this.medicationService.checkInteractions(this.medications).subscribe({
+      next: (response) => {
+        this.interactionResult = response;
+        this.isCheckingInteractions = false;
+      },
+      error: (err) => {
+        console.error('Error checking interactions:', err);
+        this.interactionError = err.error?.error || 'An unknown error occurred. Please ensure the backend is running.';
+        this.isCheckingInteractions = false;
+      },
+    });
   }
 
   formatDosage(med: Medication): string {
@@ -202,7 +247,8 @@ export class MedicationsComponent implements OnInit, OnDestroy {
       this.medicationForm.times = ["", "", ""];
     } else if (freq === "Four times daily") {
       this.medicationForm.times = ["", "", "", ""];
-    } else {
+    }
+    else {
       // No times needed for "as needed" or "weekly" options
       this.medicationForm.times = [];
     }

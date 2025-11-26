@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
@@ -17,6 +18,17 @@ export interface Medication {
   notes?: string;
 }
 
+export interface Interaction {
+  drugs: string[];
+  severity: 'high' | 'moderate' | 'low';
+  description: string;
+}
+
+export interface InteractionResponse {
+  interactions: Interaction[];
+  error?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -25,12 +37,14 @@ export class MedicationService {
   private medicationsSubject = new BehaviorSubject<Medication[]>([]);
   public medications$: Observable<Medication[]> = this.medicationsSubject.asObservable();
 
+  private backendUrl = 'http://127.0.0.1:5001';
+
   // FHIR server base URL & shared patient ID
   private fhirBase = "https://hapi.fhir.org/baseR4";
   private patientId = "group55-sharedpatient";
   private hasLoadedFromFHIR = false;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private http: HttpClient) {
     if (this.authService.isLoggedIn()) {
       this.refresh();
       this.loadMedicationsFromFHIRIfNeeded();
@@ -45,6 +59,11 @@ export class MedicationService {
         this.hasLoadedFromFHIR = false;
       }
     });
+  }
+
+  checkInteractions(medications: Medication[]): Observable<InteractionResponse> {
+    const drugNames = medications.map(m => m.name);
+    return this.http.post<InteractionResponse>(`${this.backendUrl}/api/check-interactions`, { medications: drugNames });
   }
 
   private getStorageKey(): string {
