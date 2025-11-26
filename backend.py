@@ -88,6 +88,5 @@ def check_interactions():
     return jsonify(interaction_data)
 
 if __name__ == '__main__':
-    # Port is dynamically set by Render. Default to 5001 for local development.
-    port = int(os.environ.get('PORT', 5001))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    # Using port 5001 to avoid potential conflicts with other services
+    app.run(debug=True, port=5001)
