@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MedicationService, Medication } from '../services/medication.service';
+import { MedicationService, Medication, InteractionResponse, Interaction } from '../services/medication.service';
 
 interface DashboardMedication {
   id: number;
   name: string;
   dose: string;
-  time: string;          // formatted as HH:MM AM/PM or empty
+  time: string;
   form: string;
   reason: string;
   frequency: string;
@@ -15,7 +15,7 @@ interface DashboardMedication {
   endDate?: string;
   noEndDate: boolean;
   notes?: string;
-  doseKey: string;       // unique key for this specific dose (id + time)
+  doseKey: string;
 }
 
 @Component({
@@ -27,10 +27,11 @@ interface DashboardMedication {
 })
 export class DashboardComponent implements OnInit {
   medications: DashboardMedication[] = [];
-  checked: Record<string, boolean> = {};  // key is doseKey
+  checked: Record<string, boolean> = {};
   reminders: { icon: string; text: string; type: string }[] = [];
   upcomingDoses: DashboardMedication[] = [];
-  interactions: { icon: string; text: string; status: string }[] = [];
+  interactions: InteractionResponse | null = null;
+  interactionError: string | null = null;
 
   constructor(private medicationService: MedicationService) { }
 
@@ -56,8 +57,11 @@ export class DashboardComponent implements OnInit {
   }
 
   private mapMedications(meds: Medication[]): void {
-    this.medications = meds.flatMap(med =>
-      med.times.length
+    // Filter only today's medications
+    const todayMeds = meds.filter(med => this.isMedicationActiveToday(med));
+    
+    this.medications = todayMeds.flatMap(med =>
+      med.times && med.times.length
         ? med.times.map(time => ({
           id: med.id,
           name: med.name,
@@ -72,11 +76,11 @@ export class DashboardComponent implements OnInit {
           notes: med.notes,
           doseKey: `${med.id}_${time}`
         }))
-        : [{
+        : [({
           id: med.id,
           name: med.name,
           dose: `${med.dosageAmount} ${med.dosageUnit}`,
-          time: '', // no associated time
+          time: '',
           form: med.form,
           reason: med.reason,
           frequency: med.frequency,
@@ -85,10 +89,9 @@ export class DashboardComponent implements OnInit {
           noEndDate: med.noEndDate,
           notes: med.notes,
           doseKey: `${med.id}_no_time`
-        }]
+        } as DashboardMedication)]
     );
 
-    // Sort doses: timed first ascending, then no-time doses last
     this.medications.sort((a, b) => {
       const aHasTime = a.time.includes(':');
       const bHasTime = b.time.includes(':');
@@ -137,7 +140,7 @@ export class DashboardComponent implements OnInit {
 
   markAllTaken() {
     this.medications.forEach(med => {
-      if (med.time) { // only mark timed doses
+      if (med.time) {
         this.checked[med.doseKey] = true;
         localStorage.setItem(`medcheck_${med.doseKey}`, 'true');
       }
@@ -151,7 +154,6 @@ export class DashboardComponent implements OnInit {
     this.reminders = this.medications.map(med => {
       if (!med.time.includes(':')) return null;
 
-      // Parse AM/PM correctly
       const match = med.time.match(/(\d+):(\d+) (AM|PM)/);
       if (!match) return null;
       let hour = parseInt(match[1], 10);
@@ -163,12 +165,11 @@ export class DashboardComponent implements OnInit {
       const doseTime = new Date();
       doseTime.setHours(hour, minute, 0, 0);
 
-      // Only show missed doses
       if (doseTime < now && !this.checked[med.doseKey]) {
         return { icon: '⚠️', text: `You missed your ${med.time} ${med.name} dose today.`, type: 'warning' };
       }
 
-      return null; // don't show upcoming doses here
+      return null;
     }).filter(Boolean) as any[];
   }
 
@@ -176,8 +177,7 @@ export class DashboardComponent implements OnInit {
     const now = new Date();
     this.upcomingDoses = this.medications.filter(med => {
       if (this.checked[med.doseKey]) return false;
-      if (!med.time.includes(':')) return true; // keep no-time doses
-      // Parse AM/PM correctly
+      if (!med.time.includes(':')) return true;
       const match = med.time.match(/(\d+):(\d+) (AM|PM)/);
       if (!match) return true;
       let hour = parseInt(match[1], 10);
@@ -192,14 +192,56 @@ export class DashboardComponent implements OnInit {
   }
 
   generateInteractions() {
-    this.interactions = [
-      { icon: '⚠️', text: 'Lisinopril ⇄ Metformin — may lower blood sugar; monitor for dizziness or sweating.', status: 'warning' },
-      { icon: '✅', text: 'Lisinopril ⇄ Lipitor — No known interaction.', status: 'safe' },
-      { icon: '✅', text: 'Lipitor ⇄ Metformin — No known interaction.', status: 'safe' }
-    ];
+    this.interactions = null;
+    this.interactionError = null;
+
+    const allMeds = this.medicationService.getMedications();
+    const todayMeds = allMeds.filter(med => this.isMedicationActiveToday(med));
+
+    if (todayMeds.length < 2) {
+      return;
+    }
+
+    this.medicationService.checkInteractions(todayMeds).subscribe({
+      next: (response) => {
+        this.interactions = response || null;
+      },
+      error: (err) => {
+        console.error('Error checking interactions:', err);
+        this.interactionError = err?.error?.error || 'An unknown error occurred. Please ensure the backend is running.';
+        this.interactions = null;
+      },
+    });
   }
 
   get todaysScheduledMedications(): DashboardMedication[] {
-    return this.medications.filter(med => med.time.includes(':'));
+    return this.medications.filter(med => med.time && med.time.includes(':'));
+  }
+
+  private isMedicationActiveToday(med: Medication): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const startDate = this.parseDateLocal(med.startDate);
+    startDate.setHours(0, 0, 0, 0);
+    
+    if (today < startDate) {
+      return false;
+    }
+    
+    if (med.noEndDate || !med.endDate) {
+      return true;
+    }
+    
+    const endDate = this.parseDateLocal(med.endDate);
+    endDate.setHours(0, 0, 0, 0);
+    
+    return today <= endDate;
+  }
+
+  private parseDateLocal(dateStr: string): Date {
+    if (!dateStr) return new Date();
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, month - 1, day);
   }
 }

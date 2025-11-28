@@ -1,9 +1,9 @@
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* two columns */
-  grid-auto-rows: minmax(220px, auto); /* taller rows for breathing room */
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: minmax(220px, auto);
   gap: 25px;
-  max-width: 1100px; /* bigger overall width */
+  max-width: 1100px;
   margin: 40px auto;
   font-family: 'Segoe UI', Tahoma, sans-serif;
 }
@@ -11,14 +11,14 @@
 .quadrant {
   background: #fff;
   border-radius: 12px;
-  padding: 20px 25px; /* more padding */
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  padding: 20px 25px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 }
 
 .quadrant h2 {
-  font-size: 20px; /* slightly larger header */
+  font-size: 20px;
   margin-bottom: 15px;
   color: #333;
 }
@@ -26,24 +26,22 @@
 .medication-item {
   display: flex;
   align-items: center;
-  gap: 12px; /* more space between checkbox and text */
-  margin-bottom: 10px; /* more spacing between meds */
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .med-time {
   margin-left: auto;
-  font-size: 14px; /* larger text */
+  font-size: 14px;
   color: #555;
 }
 
-/* style the checkbox for clarity */
 .medication-item input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
 }
 
-/* mark all taken button */
 .quadrant button {
   margin-top: auto;
   padding: 10px 16px;
@@ -55,6 +53,7 @@
   font-weight: bold;
   font-size: 15px;
 }
+
 .quadrant button:hover {
   background-color: #2052d1;
 }
@@ -64,7 +63,7 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 8px;
-  font-size: 15px; /* slightly larger text */
+  font-size: 15px;
 }
 
 .reminder-icon {
@@ -89,7 +88,7 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
-  font-size: 15px; /* larger text */
+  font-size: 15px;
 }
 
 .dose-time {
@@ -103,17 +102,19 @@
   font-size: 15px;
 }
 
-.interactions ul {
-  padding-left: 0;
-  list-style: none;
+.interactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.interactions li {
+.interaction-item {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  font-size: 15px; /* larger text */
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  background-color: #f8f9fa;
 }
 
 .interaction-icon {
@@ -121,12 +122,34 @@
   font-size: 18px;
 }
 
-.interactions .warning {
-  color: #d9534f;
+.interaction-drugs {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 4px;
 }
 
-.interactions .safe {
-  color: #28a745;
+.interaction-description {
+  font-size: 14px;
+  color: #555;
+}
+
+.interaction-item.high { border-left-color: #d9534f; }
+.interaction-item.high .interaction-drugs { color: #d9534f; }
+.interaction-item.moderate { border-left-color: #f0ad4e; }
+.interaction-item.moderate .interaction-drugs { color: #f0ad4e; }
+.interaction-item.low { border-left-color: #5cb85c; }
+.interaction-item.low .interaction-drugs { color: #5cb85c; }
+
+.no-interactions {
+  color: #666;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+.interaction-error {
+  color: #d9534f;
+  padding: 8px 0;
+  font-size: 14px;
 }
 
 ul {

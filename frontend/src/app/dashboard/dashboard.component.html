@@ -1,6 +1,5 @@
 <div class="dashboard-grid">
 
-  <!-- Today's Medications -->
   <section class="quadrant medications">
     <h2>Today's Medications</h2>
     <ul>
@@ -37,14 +36,24 @@
     </ul>
   </section>
 
-  <section class="quadrant interactions">
-    <h2>Drug Interactions</h2>
-    <ul>
-      <li *ngFor="let interaction of interactions" [ngClass]="interaction.status">
-        <span class="interaction-icon">{{ interaction.icon }}</span>
-        {{ interaction.text }}
-      </li>
-    </ul>
-  </section>
+<section class="quadrant interactions">
+  <h2>Drug Interactions</h2>
+  <ng-container *ngIf="interactions?.interactions as ints">
+    <div *ngIf="ints.length === 0" class="no-interactions">No interactions found.</div>
+    <div *ngIf="ints.length > 0" class="interactions-list">
+      <div *ngFor="let inter of ints" class="interaction-item" [ngClass]="inter.severity">
+        <span class="interaction-icon">
+          {{ inter.severity === 'high' ? '🔴' : (inter.severity === 'moderate' ? '⚠️' : 'ℹ️') }}
+        </span>
+        <div>
+          <div class="interaction-drugs">{{ inter.drugs.join(' + ') }}</div>
+          <div class="interaction-description">{{ inter.description }}</div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <div *ngIf="!interactions && !interactionError" class="no-interactions">No interactions found.</div>
+  <div *ngIf="interactionError" class="interaction-error">{{ interactionError }}</div>
+</section>
 
 </div>
