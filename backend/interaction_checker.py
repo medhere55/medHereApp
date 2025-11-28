@@ -3,7 +3,9 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env file from the same directory as this file
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(env_path)
 
 def get_interactions_from_llm(drug_list):
     """
@@ -79,11 +81,15 @@ def get_interactions_from_llm(drug_list):
             pass
         return None
 
-def find_drug_interactions(file_path='patient.json'):
+def find_drug_interactions(file_path=None):
     """
     Reads a FHIR JSON file, extracts prescribed medication names,
     and checks for drug-drug interactions using an LLM.
     """
+    if file_path is None:
+        # Default to patient.json in parent directory
+        file_path = os.path.join(os.path.dirname(__file__), '..', 'patient.json')
+    
     print(f"--- Reading patient data from {file_path} ---")
 
     try:
@@ -141,4 +147,4 @@ def find_drug_interactions(file_path='patient.json'):
         print(f"  Description: {description}")
 
 if __name__ == '__main__':
-    find_drug_interactions('patient.json')
+    find_drug_interactions()  # Uses default path to patient.json in parent directory

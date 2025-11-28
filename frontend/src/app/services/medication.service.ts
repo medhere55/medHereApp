@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface Medication {
   id: number;
@@ -37,7 +38,7 @@ export class MedicationService {
   private medicationsSubject = new BehaviorSubject<Medication[]>([]);
   public medications$: Observable<Medication[]> = this.medicationsSubject.asObservable();
 
-  private backendUrl = 'http://127.0.0.1:5001';
+  private backendUrl = environment.backendUrl;
 
   // FHIR server base URL & shared patient ID
   private fhirBase = "https://hapi.fhir.org/baseR4";

@@ -6,10 +6,24 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-load_dotenv()
+# Load .env file from the same directory as this file (for local dev)
+# In prod, environment variables should be set via Render
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(env_path):
+    load_dotenv(env_path)
 
 app = Flask(__name__)
-CORS(app) # This will allow requests from your Angular frontend
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+@app.route('/')
+def health_check():
+    """Health check endpoint for Render"""
+    return jsonify({"status": "healthy", "service": "medhere-backend"}), 200
+
+@app.route('/api/health')
+def api_health():
+    """API health check endpoint"""
+    return jsonify({"status": "healthy", "message": "Backend API is running"}), 200
 
 def get_interactions_from_llm(drug_list):
     """
@@ -18,7 +32,7 @@ def get_interactions_from_llm(drug_list):
     """
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        return {"error": "GEMINI_API_KEY not found in your .env file."}
+        return {"error": "GEMINI_API_KEY environment variable not found."}
 
     try:
         genai.configure(api_key=api_key)
