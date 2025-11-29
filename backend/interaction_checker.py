@@ -13,10 +13,6 @@ def get_interactions_from_llm(drug_list):
     a JSON response detailing any interactions.
     """
     
-    # WARNING: Do not hardcode your API key here!
-    # Hardcoding keys is a security risk. Anyone with access to this code
-    # can steal your key and use your account.
-    # Instead, use environment variables as shown below.
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         print("--- ERROR ---")
