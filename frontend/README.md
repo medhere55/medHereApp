@@ -7,13 +7,15 @@
 
   `cd frontend`
 
-- Install the depencies
+- Install the dependencies
 
   `npm install` 
 
 - Run the application 
 
-  `ng serve`
+  `ng serve` to use the local backend
+
+  ` ng serve --configuration production` to use the hosted backend
 
 - The application should be running now, check the terminal for URL 
 
